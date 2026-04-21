@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Ball Animation</title>
+
+    <style>
+        body{
+            margin:0;
+        }
+
+        canvas{
+            background:white;
+        }
+    </style>
+
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+
+    const canvas = document.getElementById("canvas")
+    const ctx = canvas.getContext("2d")
+
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+
+    // vị trí bóng
+    let x = canvas.width - 60
+    let y = 60
+
+    // bán kính
+    let radius = 40
+
+    // tốc độ
+    let dx = 5
+    let dy = 4   // thêm tốc độ trục Y
+
+    function animate(){
+
+        ctx.clearRect(0,0,canvas.width,canvas.height)
+
+        // vẽ hình tròn
+        ctx.beginPath()
+        ctx.arc(x,y,radius,0,Math.PI*2)
+        ctx.stroke()
+
+        // cập nhật vị trí
+        x += dx
+        y += dy
+
+        // chạm tường trái phải
+        if(x + radius >= canvas.width || x - radius <= 0){
+            dx = -dx
+        }
+
+        // chạm tường trên dưới
+        if(y + radius >= canvas.height || y - radius <= 0){
+            dy = -dy
+        }
+
+        requestAnimationFrame(animate)
+    }
+
+    animate()
+
+</script>
+
+</body>
+</html>
