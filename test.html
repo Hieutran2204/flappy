@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Flappy Bird - Minimal Style</title>
+    <style>
+        /* 1. Nền trắng cho toàn bộ trang */
+        body { text-align: center; font-family: Arial, sans-serif; background-color: #ffffff; margin: 0; overflow: hidden; }
+
+        #game-box {
+            width: 320px;
+            height: 480px;
+            background: #ffffff;
+            margin: 20px auto;
+            position: relative;
+            border: 3px solid #333;
+            overflow: hidden;
+        }
+
+
+        #bird {
+            width: 34px;
+            height: 34px;
+            background: #000000;
+            position: absolute;
+            left: 50px;
+            border: 1px solid #000;
+        }
+
+
+        .pipe {
+            width: 52px;
+            background: #ffc0cb;
+            position: absolute;
+            border: 2px solid #db7093;
+        }
+
+        #score-board { font-size: 40px; color: #333; margin-top: 10px; font-weight: bold; }
+
+        #btn-restart {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            background: #000;
+            color: #fff;
+            border: none;
+        }
+    </style>
+</head>
+<body onkeydown="if(event.code==='Space') jump()">
+
+<div id="score-board">0</div>
+<div id="game-box" onclick="jump()">
+    <div id="bird" style="top: 200px;"></div>
+    <button id="btn-restart" onclick="location.reload()">CONTINUE</button>
+</div>
+
+<script>
+    const bird = document.getElementById("bird");
+    const scoreDisplay = document.getElementById("score-board");
+    const restartBtn = document.getElementById("btn-restart");
+
+    let birdY = 200;
+    let velocity = 0;
+    let gravity = 0.25;
+    let jumpPower = -5;
+    let score = 0;
+    let isDead = false;
+
+    function update() {
+        if (isDead) return;
+
+        velocity += gravity;
+        birdY += velocity;
+        bird.style.top = birdY + "px";
+
+        if (birdY > 444 || birdY < 0) gameOver();
+
+        requestAnimationFrame(update);
+    }
+
+    function jump() {
+        if (!isDead) velocity = jumpPower;
+    }
+
+    function createPipePair() {
+        if (isDead) return;
+
+        const gap = 130;
+        const minHeight = 50;
+        const topHeight = Math.random() * (480 - gap - 2 * minHeight) + minHeight;
+        const bottomHeight = 480 - gap - topHeight;
+
+        const topPipe = document.createElement("div");
+        topPipe.className = "pipe";
+        topPipe.style.height = topHeight + "px";
+        topPipe.style.top = "0";
+        topPipe.style.left = "320px";
+
+        const bottomPipe = document.createElement("div");
+        bottomPipe.className = "pipe";
+        bottomPipe.style.height = bottomHeight + "px";
+        bottomPipe.style.bottom = "0";
+        bottomPipe.style.left = "320px";
+
+        document.getElementById("game-box").appendChild(topPipe);
+        document.getElementById("game-box").appendChild(bottomPipe);
+
+        let pipeX = 320;
+
+        function move() {
+            if (isDead) return;
+            pipeX -= 2.5;
+            topPipe.style.left = pipeX + "px";
+            bottomPipe.style.left = pipeX + "px";
+
+            if (pipeX > 10 && pipeX < 84) {
+                if (birdY < topHeight || birdY + 34 > (480 - bottomHeight)) {
+                    gameOver();
+                }
+            }
+
+            if (pipeX === 0) {
+                score++;
+                scoreDisplay.innerText = score;
+            }
+
+            if (pipeX > -60) {
+                requestAnimationFrame(move);
+            } else {
+                topPipe.remove();
+                bottomPipe.remove();
+            }
+        }
+        requestAnimationFrame(move);
+    }
+
+    function gameOver() {
+        isDead = true;
+        restartBtn.style.display = "block";
+    }
+
+    requestAnimationFrame(update);
+    setInterval(createPipePair, 1800);
+</script>
+</body>
+</html>
